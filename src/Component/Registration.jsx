@@ -149,12 +149,12 @@ export default function Registration() {
         }
         else {
             let mathId =Number( Math.random());
-            setRandomId(mathId)
-            console.log('idd :' , randomId)
+            setRandomId(mathId) // set value takes time - state variable
+            console.log('idd :' , mathId)
             let userData = {
                 "name": name, "email": emailAdd, "userType": userType,
                 "country": country, "Phone Number": phoneNumber, "password": password,
-                'gender': selectedValue, "Confirm Password": confirmPassword, 'id': randomId
+                'gender': selectedValue, "Confirm Password": confirmPassword, 'id': mathId
             }
             arr.push(userData)
             localStorage.setItem('userData', JSON.stringify(arr));
