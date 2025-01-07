@@ -1,0 +1,28 @@
+.basecontainer{
+    display: flex;
+    /* align-items: center; */
+    justify-content: center;
+
+}
+
+.basecontainer .login{
+    background-color: antiquewhite;
+    width: 250px;
+    height: 250px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+}
+
+.basecontainer .login-button{
+    padding-top: 20px;
+}
+
+.basecontainer  .span{
+    cursor: pointer;
+    color: blue;
+}
+.basecontainer .register{
+    padding-top: 15px;
+}

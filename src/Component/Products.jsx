@@ -8,13 +8,8 @@ import { useNavigate } from "react-router-dom";
 
 export default function Products() {
     const [mobile, setmobile] = useState([])
-    const [productCount, setProductCount] = useState(' ')
-
-    const mobileList = productList;
-
-    // const [total ,setTotal] = useState('');
-
-    // const []
+    const [productCount, setProductCount] = useState()
+    const [productData, setProductData] = useState({})
 
     const navi = useNavigate();
 
@@ -22,122 +17,118 @@ export default function Products() {
         navi('/MyCart')
     }
 
+    const onChangeFunction = (e, itemId) => {
+        let count = e.target.value
+        let mobileId = itemId
+        if (count > 0) {
+            // setProductCount(e.target.value)
+            setProductData({ ...productData, [mobileId]: count })
+            console.log({ ...productData, [mobileId]: count })
+        }
+    }
+
     useEffect(() => {
-        setmobile(mobileList)
+        var array = localStorage.getItem('productList')
+        array = JSON.parse(array)
+        console.log("useeffect", array)
+        setmobile(array ?? [])
     }, [])
 
-    // const productFunction = () => {
-    //     let carts = localStorage.getItem('productList')
-    //     carts = JSON.parse(carts)
-    //     console.log("mobile list", carts)
-    //     setmobile(carts)
-    // }
 
+    const cartFunction = (productItem, itemcount) => {
 
-    const cartFunction = (itemId) => {
-        console.log(itemId) 
+        let loggedInDetails = localStorage.getItem('loggedInUserData')
+        if(!loggedInDetails){
+            loggedInDetails={}
+        }
+        else{
+            loggedInDetails = JSON.parse(loggedInDetails)
+        }
 
+        let uniqueId =  loggedInDetails.id
+
+        console.log('user unique ID : ' , uniqueId)
+
+        const itemId = productItem.id
+        console.log("itemId" , itemId)
+
+        // console.log("productData. mobileId" ,productData.mobileId)
+        // console.log("prodData" , productData[itemId])
         let updatedDetail = mobile.map((product) => {
-            if (product.id == itemId) {
-                product.count--;
+            if ((product.id == itemId) && (productData[itemId] < product.count)) {
+                product.count = Number(product.count) - Number(productData[itemId]);
             }
             return product;
         })
         setmobile(updatedDetail);
+        localStorage.setItem('productList', JSON.stringify(updatedDetail))
 
-        var arr = localStorage.getItem('product')
-        arr = JSON.parse(arr)
-        console.log("arr", arr)
-        console.log("updated log", updatedDetail);
-        if (!arr) {
-            arr = []
-        }
 
-        if (arr.findIndex(x => x === itemId)) {
-            console.log("To find the mobile")
-            arr.push(updatedDetail[itemId])
+        var cartItems = localStorage.getItem('cart');
+        if (cartItems) {
+            cartItems = JSON.parse(cartItems);
         }
         else {
-            console.log("not found")
+            cartItems = []
         }
 
-        localStorage.setItem('product', JSON.stringify(arr))
-        console.log("updated array", arr)
+        var cartIndex = cartItems.findIndex(x => (x.id === itemId && x.userId === uniqueId))
+        console.log('cartIndex' , cartIndex)
 
-    }
-
-
-
-     const onChangeFunction = (e) => {
-        setProductCount(e.target.value)
-
-
-    }
-
-    const addFunction = (itemId) => {
-        console.log(itemId)
-        let updatedDetail = mobile.map((product) => {
-            if (product.id == itemId) {
-                product.count = product.count - productCount;
+        console.log("cartIndex", cartIndex)
+        if (cartIndex === -1) {
+            const newCart = {
+                id: productItem.id, brand: productItem.brand, count: productData[itemId], price: productItem.price , userId: uniqueId
             }
-            return product;
-        })
-
-        console.log("id", itemId)
-        setmobile(updatedDetail);
-        var arr = localStorage.getItem('product')
-        arr = JSON.parse(arr)
-        console.log("arr", arr)
-        console.log("updated log", updatedDetail);
-
-        if (!arr) {
-            arr = []
+            cartItems.push(newCart)
         }
-
-        if (arr.findIndex(x => x === itemId)) {
-            console.log("To find the mobile")
-            arr.push(updatedDetail[itemId])
+        else {
+            cartItems[cartIndex].count = Number(cartItems[cartIndex].count) + Number(productData[itemId])
         }
-        else {   
-            console.log("not found")
+        if (productData[itemId] > itemcount)  {
+            alert("availabe products are :" + itemcount)
         }
+        if(productData[itemId] == null){
+            alert ('Cannot be null')
+        }
+        else {
 
-        localStorage.setItem('product', JSON.stringify(arr))
+            localStorage.setItem('cart', JSON.stringify(cartItems))
+
+        }
+        console.log("updated array", cartItems)
 
     }
-
-
     return (
-        
-            <div>
-                <h1 className="header">Products</h1>
-                <button onClick={MyCart}>MyCart</button>
-                <div className="base">
-                    {
-                        mobile.map((item, ind) => {
-                            return (
-                                <div className="container" key={ind}>
+        <div>
+            <h1 className="header">Products</h1>
+            <button onClick={MyCart}>MyCart</button>
+            <div className="base">
+                {
+                    mobile.map((item, ind) => {
+                        return (
+                            <div className="container" key={ind}>
+                                <div>
                                     <div>
-                                        <div>
-                                            <img className="image" src={img} />
-                                        </div>
-                                        <div>
-                                            {item.brand}
-                                            <p >Available Count : {item.count} </p>
-                                            <input type='number' onChange={onChangeFunction}></input>
-                                            <button className={item.count === 0 ? 'outOfStock' : ''} onClick={() => addFunction(item.id)} disabled={item.count == 0 ? true : false}>add</button>
-                                            <div>
-                                                <button className={item.count === 0 ? 'outOfStock' : ''} onClick={() => cartFunction(item.id)} disabled={item.count === 0 ? true : false} > {item.count === 0 ? 'Out Of Stock' : 'Add To Cart'}</button>
-                                            </div>
-                                        </div>
+                                        <img className="image" src={img} />
+                                    </div>
+                                    <div>
+                                        {item.brand}
+                                        <p>Available Count : {item.count} </p>
+                                        <p>{item.price}</p>
+                                        <input type='number' value={productData?.[item.id]} onChange={(e) => onChangeFunction(e, item.id)}></input>
+                                        <button className={item.count <= 0 ? 'outOfStock' : ''}
+                                            onClick={() => cartFunction(item, item.count)} disabled={(productCount < 0) ? true : false}
+                                        >
+                                            {item.count <= 0 ? 'Out Of Stock' : 'Add To Cart'}
+                                        </button>
                                     </div>
                                 </div>
-                            )
-                        })
-                    }
-                </div>
-
+                            </div>
+                        )
+                    })
+                }
             </div>
-        
+        </div>
     )
 }   

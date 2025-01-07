@@ -36,3 +36,12 @@
     transform: rotate(360deg);
   }
 }
+
+
+.logOut{
+  margin-left: 95%;
+}
+
+.logoutError{
+  visibility: hidden;
+}

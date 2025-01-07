@@ -1,84 +1,112 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import '../Assets/MyCart.css';
-import { addCart } from './Products';
+import Products, { addCart } from './Products';
+import { useNavigate } from "react-router-dom";
 
 
-export default function MyCart(
-) {
-    // const { productInfo } = props
-    // props.cartData
+export default function MyCart() {
     const [cart, addMyCart] = useState([]);
-    
+    const [orginalCart, setOrginalCart] = useState([])
+    const [mobileList, setMobileList] = useState([]);
+    const navigation = useNavigate();
 
-    function getProduct() {
-        let productArray = (JSON.parse(localStorage.getItem('product')))
-        console.log("Cart" , productArray)
-        
-        addMyCart(productArray)
+
+    useEffect(() => {
+        let products = (localStorage.getItem('cart'))
+        console.log('pp' , products)
+        if(!products){
+            products=[]
+            console.log('sjvdfuh')
+        }
+        else{
+            products = JSON.parse(products)
+        }
+        setOrginalCart(products)    
+        console.log('set' , products)    
+    }, [])
+    
+    useEffect(()=>{
+        let arr = (JSON.parse(localStorage.getItem('productList')))
+        setMobileList(arr)
+        let loggedDetails = (localStorage.getItem('loggedInUserData'))
+        if (!loggedDetails) {
+            loggedDetails = []
+        }
+        else {
+            loggedDetails = JSON.parse(loggedDetails)
+        }
+        let userId = loggedDetails.id
+        if(orginalCart.length){
+            let productArray =[...orginalCart]
+            let updatedDetails = productArray.filter((updatedMobile) => {
+                if (updatedMobile.userId === userId) {
+                    return updatedMobile
+                }
+            })
+            addMyCart(updatedDetails ?? [])
+        }
+    }, [orginalCart])
+
+
+    const productFunction = () => {
+        navigation('/')
     }
-        //    let arr = (JSON.parse(localStorage.getItem('product')))
-        //    console.log("arr" , arr)
 
-        //    if(!arr){
-        //     arr=[];
-        //     alert('No items found in your cart')
-        //    }
-        //    else{
-        //     arr.push([productArray])
-        //     localStorage.setItem('product',)
-        //    }
-        //    let arr = localStorage.getItem('product')
-        //         if (!arr) {
-        //             arr = []
-        //         }
-        //         else {
-        //             arr = JSON.parse(arr)
-        //         }
+    const deleteFucntion = (itemId, deleteCount, userId) => {
 
-        //         let result = arr.findIndex((item) => item.email === emailAdd);
-        //         if (result !== -1) {
-        //             alert("no items found in your Cart")
-        //         }
-        //         else {
-        //             arr.push(userData)
-        //             localStorage.setItem('userData', JSON.stringify(arr));
-        //         }
 
-    
+        let tempCart = [...orginalCart]
+        let temp = [...mobileList]
 
-    const deleteFucntion=(itemId)=>{
+
         console.log("id", itemId)
-        // addUpdatedCart(cart)
-         let tempCart = [...cart]
-         console.log("tempcart" , tempCart)
-         let result  = tempCart.filter((mobile)=>{
-            console.log("mobile ID " , mobile.id)
-            if(mobile.id != itemId){
-                console.log("cart" , mobile)
-                // localStorage.clickcount = Number(localStorage.clickcount) + 1;
-                // console.log("localStorage" , localStorage.clickcount)
-                // addMyCart(UpdatedCart)
+        console.log("tempcart", tempCart)
+        console.log("tempCart[itemId].count", tempCart[itemId])
+
+        console.log("deleteCount", deleteCount)
+
+        let loggedInDetails = localStorage.getItem('loggedInUserData')
+        if (!loggedInDetails) {
+            loggedInDetails = {}
+        }
+        else {
+            loggedInDetails = JSON.parse(loggedInDetails)
+        }
+
+        let uniqueId = loggedInDetails.id
+
+
+
+
+        let result = tempCart.filter((mobile) => {
+            console.log(mobile, uniqueId, 'uniqueId')
+            if (mobile.id !== itemId) {
+                console.log("cart", mobile)
                 return mobile
             }
-            else{
-                mobile.count--
-                console.log("count" , mobile.count)                
+            else {
+                console.log('else console')
             }
-            
-            // addUpdatedCart(updatedLog)
-            
         })
-        console.log("updated Log", result)
+
+        let result1 = temp.map((mobile) => {
+            if (mobile.id == itemId) {
+                console.log("type of deletecount", typeof (deleteCount))
+                mobile.count = Number(mobile.count) + Number(deleteCount)
+            }
+            return mobile
+        })
+        setOrginalCart(result)
         addMyCart(result)
-        localStorage.setItem('product', JSON.stringify(result))
-        // localStorage.setItem('productList', JSON.stringify())
-        
+        setMobileList(result1)
+        localStorage.setItem('cart', JSON.stringify(result))
+        localStorage.setItem('productList', JSON.stringify(result1))
     }
 
     return (
         <div>
-            <button onClick={getProduct}>Click </button>
             {/* <button onClick={deleteFucntion}>Try Me </button> */}
+            <button onClick={productFunction} >Products</button>
             <table border={"1"}>
                 <thead>
                     <tr>
@@ -90,13 +118,13 @@ export default function MyCart(
                     </tr>
                 </thead>
                 <tbody>
-                    {cart.map((item,i)=>(
+                    {cart.map((item, i) => (
                         <tr key={i}>
                             <td>{item.id}</td>
                             <td>{item.brand}</td>
                             <td>{item.price}</td>
-                            <td> 
-                                <button onClick={() => deleteFucntion(item.id)}>delete</button>
+                            <td>
+                                <button onClick={() => deleteFucntion(item.id, item.count, item.userId)}>delete</button>
                             </td>
                             <td>{item.count}</td>
                         </tr>

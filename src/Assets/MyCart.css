@@ -1,4 +1,4 @@
-body{
+/* body{
     margin: 0px;
     padding: 0px;
 }
@@ -35,7 +35,6 @@ body{
     
 .order{
     display: flex;
-    /* align-items: center; */
 }
 
 .cartImage{
@@ -63,4 +62,5 @@ body{
     padding: 20px;
     display: flex;
     justify-content: center;
-}
+} */
+
