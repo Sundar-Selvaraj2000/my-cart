@@ -13,19 +13,18 @@ export default function MyCart() {
 
     useEffect(() => {
         let products = (localStorage.getItem('cart'))
-        console.log('pp' , products)
-        if(!products){
-            products=[]
-            console.log('sjvdfuh')
+        console.log('pp', products)
+        if (!products) {
+            products = []
         }
-        else{
+        else {
             products = JSON.parse(products)
         }
-        setOrginalCart(products)    
-        console.log('set' , products)    
+        setOrginalCart(products)
+        console.log('set', products)
     }, [])
-    
-    useEffect(()=>{
+
+    useEffect(() => {
         let arr = (JSON.parse(localStorage.getItem('productList')))
         setMobileList(arr)
         let loggedDetails = (localStorage.getItem('loggedInUserData'))
@@ -36,8 +35,8 @@ export default function MyCart() {
             loggedDetails = JSON.parse(loggedDetails)
         }
         let userId = loggedDetails.id
-        if(orginalCart.length){
-            let productArray =[...orginalCart]
+        if (orginalCart.length) {
+            let productArray = [...orginalCart]
             let updatedDetails = productArray.filter((updatedMobile) => {
                 if (updatedMobile.userId === userId) {
                     return updatedMobile
@@ -47,6 +46,10 @@ export default function MyCart() {
         }
     }, [orginalCart])
 
+
+    const firstPageFunction = () =>{
+        console.log(cart[1])
+    }       
 
     const productFunction = () => {
         navigation('/')
@@ -104,10 +107,10 @@ export default function MyCart() {
     }
 
     return (
-        <div>
+        <div >
             {/* <button onClick={deleteFucntion}>Try Me </button> */}
             <button onClick={productFunction} >Products</button>
-            <table border={"1"}>
+            <table border={"1"} className="table">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -131,7 +134,14 @@ export default function MyCart() {
                     ))}
                 </tbody>
             </table>
+            <div class="pagination">
+                <a href="#">&laquo;</a>
+                <a href="#" onClick={firstPageFunction}>1</a>
+                <a href="#">2</a>
+                <a href="#">3</a>
+                <a href="#">4</a>
+                <a href="#">&raquo;</a>
+            </div>
         </div>
     )
-
 }
